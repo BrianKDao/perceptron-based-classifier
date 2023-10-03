@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
+import math
 import time
 
-def perceptron_based_classifier(df):
+def perceptron_based_classifier(df, activation_function):
     # initialize variables
     iterations = 5000
     number_of_patterns = 4000
@@ -27,30 +28,44 @@ def perceptron_based_classifier(df):
             for i in range(0, number_of_inputs):
                 net = net + ww[i] * patterns[pattern][i]
             # unipolar output
-            output[pattern] = np.sign(net)
-
-            err = dout[pattern] - output[pattern]
+            if activation_function == "hard":
+                output[pattern] = np.sign(net)
+                err = dout[pattern] - output[pattern]
+                if err != 0:
+                    error_count += 1 
+            if activation_function == "soft":
+                output[pattern] = fbip(net)
+                err = dout[pattern] - output[pattern]
             if err != 0:
-                error_count += 1 
+                    error_count += 1 
             learn = alpha * err
-            #print(iteration, pattern, net, err, learn, ww)
+            print(iteration, pattern, net, err, learn, ww)
             for j in range(0, number_of_inputs - 1):
                 ww[j] = ww[j] + learn * patterns[pattern][j]
             ww[number_of_inputs-1] =  ww[number_of_inputs-1] + learn
-        print(error_count)
         if error_count < 40:
             print(ww)
             break
-      
+
+def fbip(net):
+    k = 0.2
+    return 2 / (1 + math.exp(-2*k*net)) - 1
+
+# def soft_error
 def normalize_data(df):
     for column in df.columns:
         df[column] = (df[column] - df[column].min()) / (df[column].max() - df[column].min())
-
     return df
 
 def parse_data(data):
     df = pd.read_csv(data, header=None, names = ['Price(USD)', 'Weight(lbs)', 'Desired_Output'])
     return normalize_data(df)
 
+def hard_activation_function(data):
+    return perceptron_based_classifier(parse_data('groupB.txt'),"hard")
+
+def soft_activation_function(df):
+    return perceptron_based_classifier(parse_data('groupB.txt'),"soft")
+
 if __name__ == '__main__':
-    print(perceptron_based_classifier(parse_data('groupB.txt')))
+    print(soft_activation_function('groupB.txt'))
