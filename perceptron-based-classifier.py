@@ -112,10 +112,10 @@ def parse_data(data):
 def hard_activation_function(data, epsilon, percent=100):
     df = parse_data(data)
     if percent == 75:
-        df = random75(data)
+        df = random75(df)
 
     if percent == 25:
-        df = random25(data)
+        df = random25(df)
 
     return perceptron_based_classifier(df,1, epsilon)
 
@@ -138,5 +138,5 @@ def random25(df):
     return sample
 
 if __name__ == '__main__':
-    print(confusion_matrix('groupC.txt', soft_activation_function('groupC.txt', 700, 75)))
+    print(confusion_matrix('groupA.txt', hard_activation_function('groupA.txt', 0.0001, 25)))
     
